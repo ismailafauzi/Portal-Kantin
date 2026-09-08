@@ -8,23 +8,33 @@
     <link rel="stylesheet" href="style.css">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- PyScript CSS & JS (Opsional jika ingin menyisipkan Python) -->
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🏢 Portal Digital Pesantren</h1>
-        <p class="subtitle">Sistem Kantin Digital, Top-Up, dan Pemasukan Pesantren</p>
-        <hr>
+    <!-- TOMBOL HAMBURGER UNTUK MEMBUKA SIDEBAR -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰ Menu</button>
 
-        <!-- NAVIGASI TAB -->
-        <div class="tab-buttons">
+    <!-- SIDEBAR TERSEMBUNYI -->
+    <div id="app-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Navigasi Menu</h3>
+            <button class="close-btn" onclick="toggleSidebar()">×</button>
+        </div>
+        <div class="sidebar-menu">
             <button class="tab-btn active" onclick="switchTab(event, 'tab-kantin')">🏪 Kantin Jajan</button>
             <button class="tab-btn" onclick="switchTab(event, 'tab-bendahara')">🧮 Bendahara & Top-Up</button>
             <button class="tab-btn" onclick="switchTab(event, 'tab-pemasukan')">💰 Dashboard Pemasukan</button>
         </div>
+    </div>
+
+    <!-- OVERLAY GELAP SAAT SIDEBAR MUNCUL -->
+    <div id="sidebar-overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- KONTEN UTAMA -->
+    <div class="container">
+        <h1>🏢 Portal Digital Pesantren</h1>
+        <p class="subtitle">Sistem Kantin Digital, Top-Up, dan Pemasukan Pesantren</p>
+        <hr>
 
         <!-- TAB 1: KANTIN (TRANSAKSI JAJAN) -->
         <div id="tab-kantin" class="tab-content active">
