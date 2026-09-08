@@ -1,0 +1,267 @@
+/* ======================================================
+   KANTIN DIGITAL PESANTREN — stylesheet
+   Palet terinspirasi ubin masjid: hijau tua & keemasan,
+   di atas latar pasir hangat. Dirancang untuk layar kios
+   di kantin: elemen besar, mudah disentuh, kontras tinggi.
+   ====================================================== */
+
+:root {
+    --pasir: #EFE8D6;
+    --kertas: #FFFFFF;
+    --tinta: #22281F;
+    --tinta-lembut: #5B6357;
+
+    --hijau-tua: #143A36;
+    --hijau: #1F5750;
+    --emas: #B8862E;
+    --emas-terang: #D9A63C;
+
+    --hijau-tepi: #2A6058;
+
+    --sukses-bg: #E7F1E1;
+    --sukses-teks: #285C33;
+    --gagal-bg: #FBE9E7;
+    --gagal-teks: #8C2F26;
+    --peringatan-bg: #FBF1DC;
+    --peringatan-teks: #7A5A12;
+
+    --radius: 14px;
+    --bayangan: 0 18px 40px -20px rgba(20, 58, 54, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 32px 16px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 12% 8%, rgba(31, 87, 80, 0.10) 0, transparent 42%),
+        radial-gradient(circle at 90% 90%, rgba(184, 134, 46, 0.12) 0, transparent 45%),
+        var(--pasir);
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    color: var(--tinta);
+}
+
+.kartu-utama {
+    width: 100%;
+    max-width: 480px;
+    background: var(--kertas);
+    border-radius: var(--radius);
+    box-shadow: var(--bayangan);
+    border-top: 6px solid var(--hijau);
+    padding: 34px 30px 30px;
+}
+
+.kepala {
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.ikon-toko {
+    display: inline-block;
+    font-size: 34px;
+    margin-bottom: 6px;
+}
+
+.kepala h1 {
+    font-family: "Lora", Georgia, serif;
+    font-size: 26px;
+    line-height: 1.25;
+    margin: 0 0 8px;
+    color: var(--hijau-tua);
+}
+
+.sub-judul {
+    margin: 0;
+    color: var(--tinta-lembut);
+    font-size: 14.5px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #E3DCC8;
+    margin: 22px 0 24px;
+}
+
+.langkah {
+    margin-bottom: 22px;
+}
+
+.langkah label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hijau-tua);
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 17px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    border: 1.5px solid #D9D2BC;
+    border-radius: 10px;
+    background: #FCFAF3;
+    color: var(--tinta);
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--hijau);
+    box-shadow: 0 0 0 3px rgba(31, 87, 80, 0.18);
+    background: var(--kertas);
+}
+
+.petunjuk {
+    margin: 8px 2px 0;
+    font-size: 13px;
+    color: var(--tinta-lembut);
+}
+
+.kotak-info {
+    margin-top: 14px;
+    padding: 16px 18px;
+    border-radius: 10px;
+    background: #F0F6F0;
+    border: 1px solid #CFE3CE;
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.kotak-info strong {
+    color: var(--hijau-tua);
+}
+
+.kotak-info--peringatan {
+    background: var(--peringatan-bg);
+    border-color: #EAD8A6;
+    color: var(--peringatan-teks);
+}
+
+.kotak-info--tersembunyi {
+    display: none;
+}
+
+.tombol-proses {
+    width: 100%;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    color: #241800;
+    background: linear-gradient(180deg, var(--emas-terang), var(--emas));
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 22px -10px rgba(184, 134, 46, 0.65);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+}
+
+.tombol-proses:hover {
+    box-shadow: 0 14px 26px -10px rgba(184, 134, 46, 0.75);
+}
+
+.tombol-proses:active {
+    transform: translateY(1px) scale(0.995);
+}
+
+.tombol-proses:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+#hasil-transaksi {
+    margin-top: 22px;
+}
+
+.pesan {
+    padding: 16px 18px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.pesan strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.pesan--sukses {
+    background: var(--sukses-bg);
+    color: var(--sukses-teks);
+    border: 1px solid #BEDDB6;
+}
+
+.pesan--gagal {
+    background: var(--gagal-bg);
+    color: var(--gagal-teks);
+    border: 1px solid #F1C7C1;
+}
+
+.pesan--peringatan {
+    background: var(--peringatan-bg);
+    color: var(--peringatan-teks);
+    border: 1px solid #EAD8A6;
+}
+
+/* ------------------------------------------------------
+   Konfeti sederhana untuk transaksi sukses
+   (pengganti st.balloons() versi Streamlit)
+------------------------------------------------------- */
+#konfeti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 40;
+}
+
+.konfeti-partikel {
+    position: absolute;
+    top: -20px;
+    width: 9px;
+    height: 14px;
+    border-radius: 2px;
+    animation: jatuh 2600ms ease-in forwards;
+}
+
+@keyframes jatuh {
+    to {
+        transform: translateY(110vh) rotate(320deg);
+        opacity: 0.9;
+    }
+}
+
+@media (max-width: 420px) {
+    .kartu-utama {
+        padding: 26px 20px 22px;
+    }
+    .kepala h1 {
+        font-size: 22px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .konfeti-partikel {
+        animation: none;
+        display: none;
+    }
+    .tombol-proses {
+        transition: none;
+    }
+}
