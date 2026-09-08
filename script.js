@@ -336,3 +336,36 @@ async function muatDataPemasukan() {
     document.getElementById("metric-topup").innerText = `Rp ${totalTopup.toLocaleString()}`;
     document.getElementById("metric-jajan").innerText = `Rp ${totalJajan.toLocaleString()}`;
 }
+
+// CONTOH LOGIKA SAAT KARTU DITEMUKAN / DIKETIK DI KANTIN:
+// Pastikan variabel sisa limit dihitung dan ditampilkan seperti ini:
+let limitHarian = santri.limit_harian || 20000;
+let sudahJajan = santri.jajan_hari_ini || 0;
+let sisaLimit = limitHarian - sudahJajan;
+
+// Tampilkan ke info box:
+document.getElementById('kantin-info-kartu').style.display = 'block';
+document.getElementById('kantin-info-kartu').innerHTML = `
+    <b>Santri Terdeteksi:</b> ${santri.nama_santri}<br>
+    <b>Saldo:</b> Rp ${santri.saldo.toLocaleString('id-ID')} | 
+    <b>Limit Harian:</b> Rp ${limitHarian.toLocaleString('id-ID')}<br>
+    <b>Sisa Limit Harian:</b> <span style="color: #c0392b; font-weight: bold;">Rp ${sisaLimit.toLocaleString('id-ID')}</span>
+`;
+
+// PANGGIL FUNGSI INI KETIKA TRANSAKSI JAJAN BERHASIL:
+function tampilkanPopupSukses(nama, saldoSisa, nominalJajan, sisaLimitBaru) {
+    const detailHTML = `
+        <b>Nama:</b> ${nama}<br>
+        <b>Nominal Jajan:</b> Rp ${Number(nominalJajan).toLocaleString('id-ID')}<br>
+        <b>Sisa Saldo:</b> Rp ${Number(saldoSisa).toLocaleString('id-ID')}<br>
+        <b>Sisa Limit Harian:</b> Rp ${Number(sisaLimitBaru).toLocaleString('id-ID')}
+    `;
+    document.getElementById('popup-content-detail').innerHTML = detailHTML;
+    document.getElementById('popup-balon').style.display = 'flex';
+}
+
+function tutupPopup() {
+    document.getElementById('popup-balon').style.display = 'none';
+    // Reset form kantin jika perlu
+    location.reload();
+}
