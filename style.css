@@ -570,3 +570,18 @@ th {
     background-color: #e2f0e4;
     color: #1e4620;
 }
+
+/* Pengaturan Tampilan Logo di Dashboard Utama */
+.logo-container {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.app-logo {
+    width: 80px;  /* Ukuran lebar pas */
+    height: 80px; /* Ukuran tinggi pas */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #27ae60;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
