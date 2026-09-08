@@ -1,8 +1,8 @@
 // ======================================================
 // KONFIGURASI SUPABASE (Ganti dengan kunci proyek Anda)
 // ======================================================
-const SUPABASE_URL = "MASUKKAN_SUPABASE_URL_ANDA_DI_SINI";
-const SUPABASE_KEY = "MASUKKAN_SUPABASE_ANON_KEY_ANDA_DI_SINI";
+const SUPABASE_URL = "https://ijipnnhgbzwatdzbdlek.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqaXBubmhnYnp3YXRkemJkbGVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMjc3NDIsImV4cCI6MjEwMzkwMzc0Mn0.TviHZ5O25ZSif9DawhcywKD9c3d4bv3yGnLPGk6iMAU";
 
 // Inisialisasi Klien Supabase
 const { createClient } = supabase;
