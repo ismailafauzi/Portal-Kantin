@@ -9,7 +9,6 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Konstanta Nama Tabel & Kolom
 const TABLE_SANTRI = "Data_Santri";
 const TABLE_LOG = "Log_Transaksi";
 
@@ -36,7 +35,6 @@ function switchTab(evt, tabName) {
     document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
 
-    // Otomatis tutup sidebar di HP setelah menu dipilih
     if (window.innerWidth <= 768) {
         toggleSidebar();
     }
@@ -54,7 +52,7 @@ function switchSubTab(evt, subTabName) {
 }
 
 // ======================================================
-// 1. KANTIN DIGITAL (JAJAN)
+// 1. KANTIN DIGITAL (JAJAN & LIMIT HARIAN)
 // ======================================================
 document.getElementById("kantin-uid").addEventListener("input", async function() {
     let uid = this.value.trim();
@@ -66,8 +64,9 @@ document.getElementById("kantin-uid").addEventListener("input", async function()
 
     let { data, error } = await _supabase.from(TABLE_SANTRI).select("*").eq("UID", uid).single();
     if (data) {
+        let limitHarian = data["Limit Harian"] !== undefined ? data["Limit Harian"] : 20000;
         infoBox.style.display = "block";
-        infoBox.innerHTML = `<strong>Santri Terdeteksi:</strong> ${data.Nama} <br><strong>Saldo:</strong> Rp ${data.Saldo.toLocaleString()}`;
+        infoBox.innerHTML = `<strong>Santri Terdeteksi:</strong> ${data.Nama} <br><strong>Saldo:</strong> Rp ${data.Saldo.toLocaleString()} | <strong>Limit Harian:</strong> Rp ${limitHarian.toLocaleString()}`;
     } else {
         infoBox.style.display = "none";
     }
@@ -104,8 +103,33 @@ async function prosesJajan() {
         return;
     }
 
-    let saldoBaru = santri.Saldo - nominal;
+    // --- CEK TOTAL TRANSAKSI HARI INI UNTUK LIMIT HARIAN ---
+    let todayStr = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    let { data: logsHariIni } = await _supabase
+        .from(TABLE_LOG)
+        .select("*")
+        .eq("ID", santri.ID)
+        .ilike("Status", "%Jajan%")
+        .gte("Waktu", todayStr + "T00:00:00");
 
+    let totalJajanHariIni = 0;
+    if (logsHariIni) {
+        logsHariIni.forEach(log => {
+            totalJajanHariIni += parseInt(log.Nominal) || 0;
+        });
+    }
+
+    let limitHarian = santri["Limit Harian"] !== undefined ? santri["Limit Harian"] : 20000;
+    let sisaLimitSebelum = limitHarian - totalJajanHariIni;
+
+    if ((totalJajanHariIni + nominal) > limitHarian) {
+        resultDiv.style.color = "red";
+        resultDiv.innerText = `❌ Melewati Limit Harian!\nLimit: Rp ${limitHarian.toLocaleString()} | Sudah jajan hari ini: Rp ${totalJajanHariIni.toLocaleString()}\nSisa limit tersedia: Rp ${sisaLimitSebelum.toLocaleString()}`;
+        return;
+    }
+    // --------------------------------------------------------
+
+    let saldoBaru = santri.Saldo - nominal;
     let { error: updateErr } = await _supabase.from(TABLE_SANTRI).update({ Saldo: saldoBaru }).eq("UID", uid);
     if (updateErr) {
         resultDiv.style.color = "red";
@@ -121,8 +145,17 @@ async function prosesJajan() {
         Status: "Jajan - Berhasil"
     }]);
 
+    let totalJajanBaru = totalJajanHariIni + nominal;
+    let sisaLimitBaru = limitHarian - totalJajanBaru;
+
     resultDiv.style.color = "green";
-    resultDiv.innerHTML = `✅ TRANSAKSI BERHASIL!<br>Nama: ${santri.Nama}<br>Sisa Saldo: Rp ${saldoBaru.toLocaleString()}`;
+    resultDiv.innerHTML = `
+        ✅ TRANSAKSI BERHASIL!<br>
+        Nama: <b>${santri.Nama}</b><br>
+        Sisa Saldo: <b>Rp ${saldoBaru.toLocaleString()}</b><br>
+        Sudah jajan hari ini: <b>Rp ${totalJajanBaru.toLocaleString()}</b><br>
+        Sisa Limit Harian: <b>Rp ${sisaLimitBaru.toLocaleString()}</b> (Limit: Rp ${limitHarian.toLocaleString()})
+    `;
     document.getElementById("kantin-info-kartu").style.display = "none";
     document.getElementById("kantin-uid").value = "";
     document.getElementById("kantin-nominal").value = "0";
@@ -184,7 +217,7 @@ async function prosesTopUp() {
         resDiv.innerText = `✅ Top-Up Tunai Berhasil! Saldo Baru: Rp ${saldoBaru.toLocaleString()}`;
     } else {
         resDiv.style.color = "orange";
-        resDiv.innerText = "ℹ️ Integrasi Midtrans QRIS memerlukan backend/server-side edge function. Gunakan metode Tunai untuk langsung update database frontend.";
+        resDiv.innerText = "ℹ️ Gunakan metode Tunai untuk langsung update database frontend.";
     }
 }
 
@@ -238,7 +271,7 @@ async function prosesDaftar() {
     }
 
     resDiv.style.color = "green";
-    resDiv.innerText = `🎉 Santri '${nama}' berhasil didaftarkan!`;
+    resDiv.innerText = `🎉 Santri '${nama}' berhasil didaftarkan! (Limit Harian: Rp ${limit.toLocaleString()})`;
 }
 
 async function prosesCekSaldo() {
@@ -247,8 +280,9 @@ async function prosesCekSaldo() {
     let { data: santri } = await _supabase.from(TABLE_SANTRI).select("*").eq("UID", uid).single();
 
     if (santri) {
+        let limitHarian = santri["Limit Harian"] !== undefined ? santri["Limit Harian"] : 20000;
         resDiv.style.color = "green";
-        resDiv.innerText = `🔍 Ditemukan - Nama: ${santri.Nama} | Saldo: Rp ${santri.Saldo.toLocaleString()}`;
+        resDiv.innerText = `🔍 ${santri.Nama} | Saldo: Rp ${santri.Saldo.toLocaleString()} | Limit Harian: Rp ${limitHarian.toLocaleString()}`;
     } else {
         resDiv.style.color = "red";
         resDiv.innerText = "❌ Kartu tidak ditemukan.";
