@@ -119,14 +119,19 @@ async function prosesJajan() {
         });
     }
 
-    let limitHarian = santri["Limit Harian"] !== undefined ? santri["Limit Harian"] : 20000;
-    let sisaLimitSebelum = limitHarian - totalJajanHariIni;
+    // CONTOH BAGIAN KODE SAAT KARTU KANTIN DITEMUKAN:
+let limitHarian = santri.limit_harian || 20000;
+let sudahJajan = santri.jajan_hari_ini || 0;
+let sisaLimit = limitHarian - sudahJajan;
 
-    if ((totalJajanHariIni + nominal) > limitHarian) {
-        resultDiv.style.color = "red";
-        resultDiv.innerText = `❌ Melewati Limit Harian!\nLimit: Rp ${limitHarian.toLocaleString()} | Sudah jajan hari ini: Rp ${totalJajanHariIni.toLocaleString()}\nSisa limit tersedia: Rp ${sisaLimitSebelum.toLocaleString()}`;
-        return;
-    }
+// Tampilkan ke kotak info kartu (#kantin-info-kartu)
+document.getElementById('kantin-info-kartu').style.display = 'block';
+document.getElementById('kantin-info-kartu').innerHTML = `
+    <b>Santri Terdeteksi:</b> ${santri.nama_santri}<br>
+    <b>Saldo:</b> Rp ${santri.saldo.toLocaleString('id-ID')} | 
+    <b>Limit Harian:</b> Rp ${limitHarian.toLocaleString('id-ID')}<br>
+    <b>Sisa Limit Harian:</b> <span style="color: #c0392b; font-weight: bold;">Rp ${sisaLimit.toLocaleString('id-ID')}</span>
+`;
     // --------------------------------------------------------
 
     let saldoBaru = santri.Saldo - nominal;
