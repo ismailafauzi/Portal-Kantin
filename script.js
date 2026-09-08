@@ -4,6 +4,7 @@
 const SUPABASE_URL = "https://ijipnnhgbzwatdzbdlek.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqaXBubmhnYnp3YXRkemJkbGVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMjc3NDIsImV4cCI6MjEwMzkwMzc0Mn0.TviHZ5O25ZSif9DawhcywKD9c3d4bv3yGnLPGk6iMAU";
 
+
 // Inisialisasi Klien Supabase
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -11,6 +12,16 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Konstanta Nama Tabel & Kolom
 const TABLE_SANTRI = "Data_Santri";
 const TABLE_LOG = "Log_Transaksi";
+
+// ======================================================
+// FUNGSI KONTROL SIDEBAR TERSEMBUNYI
+// ======================================================
+function toggleSidebar() {
+    let sidebar = document.getElementById("app-sidebar");
+    let overlay = document.getElementById("sidebar-overlay");
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+}
 
 // ======================================================
 // NAVIGASI ANTAR TAB
@@ -24,6 +35,11 @@ function switchTab(evt, tabName) {
 
     document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
+
+    // Otomatis tutup sidebar di HP setelah menu dipilih
+    if (window.innerWidth <= 768) {
+        toggleSidebar();
+    }
 }
 
 function switchSubTab(evt, subTabName) {
@@ -69,7 +85,6 @@ async function prosesJajan() {
         return;
     }
 
-    // Ambil data santri
     let { data: santri, error } = await _supabase.from(TABLE_SANTRI).select("*").eq("UID", uid).single();
     if (!santri) {
         resultDiv.style.color = "red";
@@ -91,7 +106,6 @@ async function prosesJajan() {
 
     let saldoBaru = santri.Saldo - nominal;
 
-    // Update Saldo
     let { error: updateErr } = await _supabase.from(TABLE_SANTRI).update({ Saldo: saldoBaru }).eq("UID", uid);
     if (updateErr) {
         resultDiv.style.color = "red";
@@ -99,7 +113,6 @@ async function prosesJajan() {
         return;
     }
 
-    // Catat Log
     await _supabase.from(TABLE_LOG).insert([{
         Waktu: new Date().toISOString(),
         ID: santri.ID,
@@ -122,7 +135,6 @@ async function prosesJajan() {
 function loginAdmin() {
     let key = document.getElementById("admin-key").value;
     let res = document.getElementById("login-result");
-    // Ubah password admin sesuai kebutuhan Anda
     if (key === "kunci-rahasia-anda" || key === "admin123") {
         document.getElementById("admin-login-box").style.display = "none";
         document.getElementById("admin-dashboard").style.display = "block";
@@ -249,7 +261,6 @@ async function prosesCekSaldo() {
 function loginPemasukan() {
     let pw = document.getElementById("pemasukan-pw").value;
     let res = document.getElementById("pemasukan-login-result");
-    // Ubah password sesuai keinginan
     if (pw === "admin123" || pw === "bendahara") {
         document.getElementById("pemasukan-login-box").style.display = "none";
         document.getElementById("pemasukan-dashboard").style.display = "block";
