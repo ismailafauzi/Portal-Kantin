@@ -1,216 +1,708 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Digital Pesantren</title>
-    <!-- Favicon: logo pesantren dipakai sebagai ikon tab browser -->
-    <link rel="icon" type="image/png" href="logo.png">
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- CSS Eksternal -->
-    <link rel="stylesheet" href="style.css">
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+/* ==========================================================
+   TOKEN DESAIN — Portal Digital Pesantren
+   Palet hijau pesantren + emas hangat, tipografi Fraunces
+   (judul) & Plus Jakarta Sans (isi), nuansa hangat & terpercaya
+   ========================================================== */
+:root {
+    --bg: #FBF7EE;
+    --surface: #FFFFFF;
+    --surface-soft: #F3EFE2;
+    --green-900: #123822;
+    --green-700: #176B3B;
+    --green-600: #1E8449;
+    --green-500: #27AE60;
+    --green-100: #E4F1E6;
+    --gold-700: #A87A1E;
+    --gold-500: #C7962C;
+    --gold-100: #F4E7C8;
+    --ink: #22281F;
+    --muted: #6E7B6E;
+    --border: #E2DAC4;
+    --border-green: #CFE3D3;
+    --danger: #B23A2E;
+    --shadow-sm: 0 2px 8px rgba(18, 56, 34, 0.08);
+    --shadow-md: 0 10px 30px rgba(18, 56, 34, 0.12);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-    <!-- TOMBOL HAMBURGER UNTUK MEMBUKA SIDEBAR -->
-    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Buka menu">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-    </button>
+* { box-sizing: border-box; }
 
-    <!-- SIDEBAR TERSEMBUNYI -->
-    <div id="app-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <img src="logo.png" alt="" class="sidebar-logo" onerror="this.style.display='none'">
-                <h3>Navigasi Menu</h3>
-            </div>
-            <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
-        </div>
-        <div class="sidebar-menu">
-            <button class="tab-btn active" onclick="switchTab(event, 'tab-kantin')"><span class="tab-icon">🏪</span> Kantin Jajan</button>
-            <!-- Menu Bendahara & Dashboard Pemasukan disembunyikan dari tampilan utama.
-                 Untuk memunculkannya lagi, hapus komentar pada 2 tombol di bawah ini. -->
-            <!--
-            <button class="tab-btn" onclick="switchTab(event, 'tab-bendahara')"><span class="tab-icon">🧮</span> Bendahara &amp; Top-Up</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-pemasukan')"><span class="tab-icon">💰</span> Dashboard Pemasukan</button>
-            -->
-        </div>
-    </div>
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(circle at 8% 0%, rgba(39, 174, 96, 0.08), transparent 40%),
+        radial-gradient(circle at 100% 12%, rgba(199, 150, 44, 0.10), transparent 45%);
+    background-attachment: fixed;
+    color: var(--ink);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
 
-    <!-- OVERLAY GELAP SAAT SIDEBAR MUNCUL -->
-    <div id="sidebar-overlay" class="overlay" onclick="toggleSidebar()"></div>
+:focus-visible {
+    outline: 3px solid var(--gold-500);
+    outline-offset: 2px;
+}
 
-    <!-- LAPISAN BALON UNTUK ANIMASI TRANSAKSI BERHASIL -->
-    <div id="balloon-layer" aria-hidden="true"></div>
+/* ---------- Tombol hamburger sidebar ---------- */
+.sidebar-toggle {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    background: var(--green-900);
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
 
-    <!-- KONTEN UTAMA -->
-    <div class="container">
+.sidebar-toggle:hover { background: var(--green-700); }
+.sidebar-toggle:active { transform: scale(0.94); }
 
-        <!-- HEADER UTAMA: JUDUL DI KIRI, LOGO DI KANAN -->
-        <div class="header-container">
-            <div class="title-wrapper">
-                <p class="eyebrow">Sistem Terpadu Santri</p>
-                <h1>Portal Digital<br>Pesantren</h1>
-                <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
-            </div>
-            <img src="logo.png" alt="Logo Pesantren" class="app-logo" onerror="this.style.display='none'">
-        </div>
-        <div class="header-divider" aria-hidden="true"></div>
+.hamburger-bar {
+    width: 20px;
+    height: 2px;
+    background: var(--gold-100);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
 
-        <!-- TAB 1: KANTIN (TRANSAKSI JAJAN) -->
-        <div id="tab-kantin" class="tab-content active">
-            <h2>Kantin Digital Santri</h2>
-            <div class="form-group">
-                <label>1. Tempelkan / masukkan ID kartu RFID</label>
-                <input type="text" id="kantin-uid" placeholder="Menunggu kartu..." autocomplete="off">
-            </div>
+.sidebar-toggle.is-open .hamburger-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.sidebar-toggle.is-open .hamburger-bar:nth-child(2) { opacity: 0; }
+.sidebar-toggle.is-open .hamburger-bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-            <div id="kantin-info-kartu" class="stat-card" style="display: none;">
-                <div class="stat-card-head">
-                    <span class="stat-name" id="stat-nama">—</span>
-                    <span class="stat-badge" id="stat-badge">Terdeteksi</span>
-                </div>
-                <div class="stat-hero">
-                    <span class="stat-hero-label">Saldo saat ini</span>
-                    <span class="stat-hero-value" id="stat-saldo">Rp 0</span>
-                </div>
-                <div class="stat-grid">
-                    <div class="stat-cell">
-                        <span class="stat-cell-label">Sudah jajan hari ini</span>
-                        <span class="stat-cell-value" id="stat-sudah-jajan">Rp 0</span>
-                    </div>
-                    <div class="stat-cell stat-cell-accent">
-                        <span class="stat-cell-label">Sisa limit harian</span>
-                        <span class="stat-cell-value" id="stat-sisa-limit">Rp 0</span>
-                    </div>
-                </div>
-                <div class="limit-bar" aria-hidden="true">
-                    <div class="limit-bar-fill" id="limit-bar-fill" style="width:0%"></div>
-                </div>
-                <p class="limit-caption">Limit harian: <span id="stat-limit-total">Rp 0</span></p>
-            </div>
+/* ---------- Sidebar ---------- */
+.sidebar {
+    height: 100%;
+    width: 270px;
+    position: fixed;
+    z-index: 1002;
+    top: 0;
+    left: -270px;
+    background: linear-gradient(175deg, var(--green-900) 0%, #0C2818 100%);
+    overflow-x: hidden;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-top: 10px;
+    box-shadow: 6px 0 24px rgba(0, 0, 0, 0.28);
+}
 
-            <div class="form-group">
-                <label>2. Masukkan nominal belanja (Rp)</label>
-                <input type="text" inputmode="numeric" class="input-rupiah" id="kantin-nominal" value="0">
-            </div>
-            <div class="form-group">
-                <label>3. Masukkan PIN santri</label>
-                <input type="password" id="kantin-pin" placeholder="Ketik PIN di sini" autocomplete="new-password">
-            </div>
-            <button class="btn-primary" onclick="prosesJajan()">Proses transaksi jajan 💳</button>
-            <div id="kantin-result" class="result-msg"></div>
-        </div>
+.sidebar.active { left: 0; }
 
-        <!-- TAB 2: BENDAHARA -->
-        <div id="tab-bendahara" class="tab-content">
-            <h2>Portal Bendahara Pesantren</h2>
-            <div id="admin-login-box">
-                <p class="hint-text">Masukkan kunci admin untuk akses menu bendahara</p>
-                <input type="password" id="admin-key" placeholder="Kunci admin">
-                <button class="btn-primary" onclick="loginAdmin()">Masuk admin</button>
-                <div id="login-result" class="result-msg"></div>
-            </div>
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px 16px 20px;
+    border-bottom: 1px solid rgba(244, 231, 200, 0.15);
+}
 
-            <div id="admin-dashboard" style="display: none;">
-                <div class="sub-tabs">
-                    <button class="sub-tab-btn active" onclick="switchSubTab(event, 'sub-topup')">Top-up saldo</button>
-                    <button class="sub-tab-btn" onclick="switchSubTab(event, 'sub-daftar')">Daftar santri</button>
-                    <button class="sub-tab-btn" onclick="switchSubTab(event, 'sub-cek')">Cek saldo</button>
-                </div>
+.sidebar-brand { display: flex; align-items: center; gap: 10px; }
 
-                <div id="sub-topup" class="sub-content active">
-                    <h3>Form top-up saldo</h3>
-                    <input type="text" id="topup-uid" placeholder="ID kartu RFID santri">
-                    <input type="text" inputmode="numeric" class="input-rupiah" id="topup-nominal" placeholder="Nominal top-up (Rp)">
-                    <select id="topup-metode">
-                        <option value="tunai">💵 Uang tunai (kas)</option>
-                        <option value="qris">📱 QRIS otomatis (Midtrans)</option>
-                    </select>
-                    <button class="btn-primary" onclick="prosesTopUp()">Proses top-up 💰</button>
-                    <div id="topup-result" class="result-msg"></div>
-                </div>
+.sidebar-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold-500);
+}
 
-                <div id="sub-daftar" class="sub-content">
-                    <h3>Pendaftaran santri baru</h3>
-                    <input type="text" id="daftar-uid" placeholder="ID kartu RFID baru">
-                    <input type="text" id="daftar-nama" placeholder="Nama lengkap santri">
-                    <input type="number" id="daftar-kelas" placeholder="Kelas (angka)">
-                    <input type="text" id="daftar-kamar" placeholder="Kamar / blok asrama">
-                    <input type="password" id="daftar-pin" placeholder="PIN rahasia (4–6 angka)">
-                    <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-saldo" placeholder="Saldo awal (Rp)" value="0">
-                    <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-limit" placeholder="Limit harian (Rp)" value="20.000">
-                    <button class="btn-primary" onclick="prosesDaftar()">Daftarkan santri ✍</button>
-                    <div id="daftar-result" class="result-msg"></div>
-                </div>
+.sidebar-header h3 {
+    color: var(--gold-100);
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+}
 
-                <div id="sub-cek" class="sub-content">
-                    <h3>Cek saldo santri</h3>
-                    <input type="text" id="cek-uid" placeholder="ID kartu RFID">
-                    <button class="btn-primary" onclick="prosesCekSaldo()">Cek saldo 🔍</button>
-                    <div id="cek-result" class="result-msg"></div>
-                </div>
-                <button class="btn-logout" onclick="logoutAdmin()">🚪 Logout admin</button>
-            </div>
-        </div>
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--gold-100);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
 
-        <!-- TAB 3: PEMASUKAN -->
-        <div id="tab-pemasukan" class="tab-content">
-            <h2>Dashboard Pemasukan Santri</h2>
-            <div id="pemasukan-login-box">
-                <input type="password" id="pemasukan-pw" placeholder="Password bendahara">
-                <button class="btn-primary" onclick="loginPemasukan()">Masuk dashboard</button>
-                <div id="pemasukan-login-result" class="result-msg"></div>
-            </div>
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 8px;
+}
 
-            <div id="pemasukan-dashboard" style="display: none;">
-                <div class="metrics-container">
-                    <div class="card-metric">
-                        <h4>Total top-up</h4>
-                        <p id="metric-topup">Rp 0</p>
-                    </div>
-                    <div class="card-metric">
-                        <h4>Total jajan kantin</h4>
-                        <p id="metric-jajan">Rp 0</p>
-                    </div>
-                </div>
-                <h3>Rincian transaksi masuk</h3>
-                <div style="overflow-x:auto;">
-                    <table id="tabel-transaksi">
-                        <thead>
-                            <tr>
-                                <th>Waktu</th>
-                                <th>Nama santri</th>
-                                <th>Nominal</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <button class="btn-logout" onclick="logoutPemasukan()">🚪 Logout dashboard</button>
-            </div>
-        </div>
-    </div>
+.tab-btn {
+    background: rgba(244, 231, 200, 0.06);
+    color: #E9F3EA;
+    border: 1px solid rgba(244, 231, 200, 0.12);
+    padding: 13px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-body);
+    border-radius: 10px;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    text-align: left;
+    font-size: 0.94rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-    <!-- ELEMEN POPUP / BALON TRANSAKSI BERHASIL -->
-    <div id="popup-balon" class="popup-overlay" style="display: none;">
-        <div class="popup-card">
-            <div class="popup-icon">🎉</div>
-            <h3>Transaksi berhasil!</h3>
-            <div id="popup-content-detail" class="popup-details"></div>
-            <button class="btn-primary" onclick="tutupPopup()">Tutup</button>
-        </div>
-    </div>
+.tab-icon { font-size: 1.05rem; }
 
-    <!-- JavaScript Utama -->
-    <script src="script.js"></script>
-</body>
-</html>
+.tab-btn:hover { background: rgba(244, 231, 200, 0.12); transform: translateX(2px); }
+
+.tab-btn.active {
+    background: var(--gold-500);
+    color: var(--green-900);
+    border-color: var(--gold-500);
+    box-shadow: 0 4px 12px rgba(199, 150, 44, 0.3);
+}
+
+/* ---------- Overlay ---------- */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 24, 16, 0.45);
+    backdrop-filter: blur(1px);
+    z-index: 1000;
+}
+
+.overlay.active { display: block; }
+
+/* ---------- Lapisan balon ---------- */
+#balloon-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10000;
+    overflow: hidden;
+}
+
+.balloon {
+    position: absolute;
+    bottom: -60px;
+    font-size: 34px;
+    opacity: 0;
+    will-change: transform, opacity;
+    animation-name: float-up;
+    animation-timing-function: cubic-bezier(0.33, 0.1, 0.4, 0.9);
+    animation-fill-mode: forwards;
+}
+
+@keyframes float-up {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    8% { opacity: 1; }
+    50% { transform: translate(var(--drift), -55vh) rotate(var(--spin)); }
+    92% { opacity: 1; }
+    100% { transform: translate(calc(var(--drift) * 1.6), -115vh) rotate(calc(var(--spin) * 1.6)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .balloon { animation: none; display: none; }
+}
+
+/* ---------- Konten utama ---------- */
+.container {
+    max-width: 620px;
+    margin: 44px auto;
+    background: var(--surface);
+    padding: 30px 28px 34px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-green);
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--green-700), var(--gold-500), var(--green-700));
+    background-size: 200% 100%;
+    animation: shimmer 6s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ---------- Tampil/sembunyi konten tab ---------- */
+/* !important sengaja dipasang sebagai jaring pengaman ekstra:
+   walau ada CSS lama/cache yang tertinggal, tab non-aktif TETAP tersembunyi. */
+.tab-content { display: none !important; }
+.tab-content.active { display: block !important; animation: tab-in 0.22s ease-out; }
+
+@keyframes tab-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1, h2, h3 {
+    color: var(--green-900);
+    font-family: var(--font-display);
+    font-weight: 600;
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin: 4px 0 22px;
+}
+
+h3 { font-size: 1.1rem; margin: 0 0 14px; }
+
+/* ---------- Header: judul kiri, logo kanan ---------- */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.title-wrapper { display: flex; flex-direction: column; }
+
+.eyebrow {
+    margin: 0 0 4px;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--gold-700);
+    font-weight: 700;
+}
+
+.header-container h1 {
+    margin: 0;
+    font-size: 1.7rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
+.subtitle {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.4;
+    max-width: 32ch;
+}
+
+.app-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--gold-500);
+    box-shadow: 0 6px 16px rgba(199, 150, 44, 0.35), 0 2px 4px rgba(0, 0, 0, 0.10);
+    flex-shrink: 0;
+}
+
+/* ---------- Lencana pengganti kalau logo.png belum ditemukan ---------- */
+.logo-fallback {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(155deg, var(--gold-500), var(--gold-700));
+    color: var(--green-900);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    border: 3px solid var(--green-900);
+    box-shadow: 0 6px 16px rgba(199, 150, 44, 0.35), 0 2px 4px rgba(0, 0, 0, 0.10);
+}
+
+.logo-fallback-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+    border: 2px solid var(--gold-500);
+    background: linear-gradient(155deg, var(--gold-500), var(--gold-700));
+    color: var(--green-900);
+}
+
+.header-divider {
+    height: 10px;
+    margin: 20px 0 22px;
+    background-image: radial-gradient(circle, var(--border-green) 1.6px, transparent 1.6px);
+    background-size: 14px 10px;
+    background-position: center;
+    opacity: 0.9;
+}
+
+/* ---------- Form & input ---------- */
+.form-group { margin-bottom: 15px; }
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: var(--green-700);
+}
+
+.hint-text {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin: 0 0 10px;
+}
+
+input, select {
+    width: 100%;
+    padding: 11px 12px;
+    margin-bottom: 10px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: var(--font-body);
+    box-sizing: border-box;
+    background-color: #FCFBF7;
+    color: var(--ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus {
+    border-color: var(--green-500);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.14);
+}
+
+button.btn-primary {
+    width: 100%;
+    background: var(--green-700);
+    color: #fff;
+    border: none;
+    padding: 13px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.16s ease, transform 0.06s ease;
+}
+
+button.btn-primary:hover { background: var(--green-600); box-shadow: 0 4px 14px rgba(23, 107, 59, 0.28); }
+button.btn-primary:active { transform: scale(0.98); }
+
+.btn-logout {
+    background: transparent;
+    color: var(--danger);
+    border: 1.5px solid rgba(178, 58, 46, 0.35);
+    padding: 9px 15px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: background 0.15s ease;
+}
+
+.btn-logout:hover { background: rgba(178, 58, 46, 0.08); }
+
+.result-msg {
+    margin-top: 15px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    font-size: 0.94rem;
+}
+
+/* ---------- Kartu status santri (hero saldo) ---------- */
+.stat-card {
+    background: linear-gradient(165deg, var(--green-900) 0%, #16472A 100%);
+    border-radius: var(--radius-md);
+    padding: 18px 20px 16px;
+    margin-bottom: 16px;
+    color: #EAF4EC;
+    box-shadow: var(--shadow-sm);
+    animation: card-in 0.22s ease-out;
+}
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.stat-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #fff;
+}
+
+.stat-badge {
+    background: rgba(199, 150, 44, 0.22);
+    color: var(--gold-100);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid rgba(199, 150, 44, 0.4);
+}
+
+.stat-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 14px;
+}
+
+.stat-hero-label {
+    font-size: 0.78rem;
+    color: rgba(234, 244, 236, 0.7);
+}
+
+.stat-hero-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.stat-cell {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.stat-cell-accent {
+    background: rgba(199, 150, 44, 0.16);
+    border: 1px solid rgba(199, 150, 44, 0.35);
+}
+
+.stat-cell-label {
+    font-size: 0.72rem;
+    color: rgba(234, 244, 236, 0.72);
+}
+
+.stat-cell-value {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: #fff;
+}
+
+.limit-bar {
+    height: 7px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+}
+
+.limit-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-500), #E4B84C);
+    border-radius: 100px;
+    transition: width 0.35s ease;
+}
+
+.limit-caption {
+    margin: 7px 0 0;
+    font-size: 0.75rem;
+    color: rgba(234, 244, 236, 0.68);
+    text-align: right;
+}
+
+/* ---------- Sub-tabs Bendahara ---------- */
+.sub-tabs {
+    display: flex;
+    margin-bottom: 16px;
+    gap: 6px;
+    background: var(--surface-soft);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.sub-tab-btn {
+    background: transparent;
+    border: none;
+    padding: 9px;
+    cursor: pointer;
+    flex: 1;
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    border-radius: 7px;
+    color: var(--green-900);
+    font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sub-tab-btn.active {
+    background: var(--green-700);
+    color: #fff;
+}
+
+/* ---------- Dashboard pemasukan ---------- */
+.metrics-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card-metric {
+    background: var(--green-100);
+    border: 1px solid var(--border-green);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    flex: 1;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-metric:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-metric h4 {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.card-metric p {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--green-900);
+    margin: 6px 0 0 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.83rem;
+}
+
+table, th, td { border: 1px solid var(--border-green); }
+
+th, td { padding: 9px 8px; text-align: left; }
+
+th {
+    background-color: var(--green-100);
+    color: var(--green-900);
+    font-weight: 700;
+}
+
+tbody tr:nth-child(even) { background: #FAFBF6; }
+tbody tr:hover { background: var(--green-100); }
+td { transition: background 0.12s ease; }
+
+/* ---------- Popup transaksi berhasil ---------- */
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 22, 14, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.25s ease;
+    padding: 20px;
+}
+
+.popup-card {
+    background: var(--surface);
+    padding: 30px 26px;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: popUpScale 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-top: 4px solid var(--gold-500);
+}
+
+.popup-icon {
+    font-size: 46px;
+    margin-bottom: 8px;
+    display: inline-block;
+    animation: popup-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+
+@keyframes popup-bounce {
+    0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
+    60% { transform: scale(1.15) rotate(6deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.popup-card h3 {
+    color: var(--green-800, var(--green-700));
+    margin-bottom: 14px;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.popup-details {
+    text-align: left;
+    background: var(--surface-soft);
+    padding: 13px 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    border-left: 4px solid var(--green-500);
+    color: var(--ink);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes popUpScale {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- Responsif mobile ---------- */
+@media (max-width: 600px) {
+    .container {
+        margin: 16px 12px;
+        padding: 22px 18px 26px;
+    }
+    .header-container {
+        flex-direction: row-reverse;
+    }
+    .app-logo { width: 56px; height: 56px; }
+    .header-container h1 { font-size: 1.35rem; }
+    .stat-hero-value { font-size: 1.7rem; }
+}
