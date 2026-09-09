@@ -99,7 +99,7 @@
 
             <div class="form-group">
                 <label>2. Masukkan nominal belanja (Rp)</label>
-                <input type="number" id="kantin-nominal" value="0" step="500">
+                <input type="text" inputmode="numeric" class="input-rupiah" id="kantin-nominal" value="0">
             </div>
             <div class="form-group">
                 <label>3. Masukkan PIN santri</label>
@@ -129,7 +129,7 @@
                 <div id="sub-topup" class="sub-content active">
                     <h3>Form top-up saldo</h3>
                     <input type="text" id="topup-uid" placeholder="ID kartu RFID santri">
-                    <input type="number" id="topup-nominal" placeholder="Nominal top-up (Rp)" step="1000">
+                    <input type="text" inputmode="numeric" class="input-rupiah" id="topup-nominal" placeholder="Nominal top-up (Rp)">
                     <select id="topup-metode">
                         <option value="tunai">💵 Uang tunai (kas)</option>
                         <option value="qris">📱 QRIS otomatis (Midtrans)</option>
@@ -145,8 +145,8 @@
                     <input type="number" id="daftar-kelas" placeholder="Kelas (angka)">
                     <input type="text" id="daftar-kamar" placeholder="Kamar / blok asrama">
                     <input type="password" id="daftar-pin" placeholder="PIN rahasia (4–6 angka)">
-                    <input type="number" id="daftar-saldo" placeholder="Saldo awal (Rp)" value="0" step="1000">
-                    <input type="number" id="daftar-limit" placeholder="Limit harian (Rp)" value="20000" step="1000">
+                    <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-saldo" placeholder="Saldo awal (Rp)" value="0">
+                    <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-limit" placeholder="Limit harian (Rp)" value="20.000">
                     <button class="btn-primary" onclick="prosesDaftar()">Daftarkan santri ✍</button>
                     <div id="daftar-result" class="result-msg"></div>
                 </div>
