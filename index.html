@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Digital Pesantren</title>
     <!-- Favicon: logo pesantren dipakai sebagai ikon tab browser -->
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png?v=2">
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- CSS Eksternal -->
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS Eksternal (?v=2 = cache-busting, paksa browser ambil versi terbaru) -->
+    <link rel="stylesheet" href="style.css?v=2">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -28,19 +28,15 @@
     <div id="app-sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <img src="logo.png" alt="" class="sidebar-logo" onerror="this.style.display='none'">
+                <img src="logo.png?v=2" alt="" class="sidebar-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback logo-fallback-sm',textContent:'PP'}))">
                 <h3>Navigasi Menu</h3>
             </div>
             <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
         </div>
         <div class="sidebar-menu">
             <button class="tab-btn active" onclick="switchTab(event, 'tab-kantin')"><span class="tab-icon">🏪</span> Kantin Jajan</button>
-            <!-- Menu Bendahara & Dashboard Pemasukan disembunyikan dari tampilan utama.
-                 Untuk memunculkannya lagi, hapus komentar pada 2 tombol di bawah ini. -->
-            <!--
             <button class="tab-btn" onclick="switchTab(event, 'tab-bendahara')"><span class="tab-icon">🧮</span> Bendahara &amp; Top-Up</button>
             <button class="tab-btn" onclick="switchTab(event, 'tab-pemasukan')"><span class="tab-icon">💰</span> Dashboard Pemasukan</button>
-            -->
         </div>
     </div>
 
@@ -60,7 +56,7 @@
                 <h1>Portal Digital<br>Pesantren</h1>
                 <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
             </div>
-            <img src="logo.png" alt="Logo Pesantren" class="app-logo" onerror="this.style.display='none'">
+            <img src="logo.png?v=2" alt="Logo Pesantren" class="app-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'PP'}))">
         </div>
         <div class="header-divider" aria-hidden="true"></div>
 
@@ -210,7 +206,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Utama -->
-    <script src="script.js"></script>
+    <!-- JavaScript Utama (?v=2 = cache-busting) -->
+    <script src="script.js?v=2"></script>
 </body>
 </html>
