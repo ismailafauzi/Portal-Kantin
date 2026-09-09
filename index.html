@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Digital Pesantren</title>
     <!-- Favicon: logo pesantren dipakai sebagai ikon tab browser -->
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="icon" type="image/png" href="logo.png">
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,15 +28,19 @@
     <div id="app-sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <img src="logo.jpg" alt="" class="sidebar-logo" onerror="this.style.display='none'">
+                <img src="logo.png" alt="" class="sidebar-logo" onerror="this.style.display='none'">
                 <h3>Navigasi Menu</h3>
             </div>
             <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
         </div>
         <div class="sidebar-menu">
             <button class="tab-btn active" onclick="switchTab(event, 'tab-kantin')"><span class="tab-icon">🏪</span> Kantin Jajan</button>
+            <!-- Menu Bendahara & Dashboard Pemasukan disembunyikan dari tampilan utama.
+                 Untuk memunculkannya lagi, hapus komentar pada 2 tombol di bawah ini. -->
+            <!--
             <button class="tab-btn" onclick="switchTab(event, 'tab-bendahara')"><span class="tab-icon">🧮</span> Bendahara &amp; Top-Up</button>
             <button class="tab-btn" onclick="switchTab(event, 'tab-pemasukan')"><span class="tab-icon">💰</span> Dashboard Pemasukan</button>
+            -->
         </div>
     </div>
 
@@ -56,8 +60,7 @@
                 <h1>Portal Digital<br>Pesantren</h1>
                 <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
             </div>
-            <!-- SESUAIKAN EKSTENSI 'logo.jpg' MENJADI 'logo.png' JIKA FORMAT ASLI GAMBAR ANDA .png -->
-            <img src="logo.jpg" alt="Logo Pesantren" class="app-logo" onerror="this.style.display='none'">
+            <img src="logo.png" alt="Logo Pesantren" class="app-logo" onerror="this.style.display='none'">
         </div>
         <div class="header-divider" aria-hidden="true"></div>
 
