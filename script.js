@@ -107,8 +107,10 @@ function sembunyikanKartuStatus() {
 function toggleSidebar() {
     let sidebar = document.getElementById("app-sidebar");
     let overlay = document.getElementById("sidebar-overlay");
+    let toggleBtn = document.querySelector(".sidebar-toggle");
     sidebar.classList.toggle("active");
     overlay.classList.toggle("active");
+    if (toggleBtn) toggleBtn.classList.toggle("is-open");
 }
 
 // ======================================================
