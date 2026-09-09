@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Digital Pesantren</title>
+    <!-- Favicon: logo pesantren dipakai sebagai ikon tab browser -->
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS Eksternal -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- TOMBOL HAMBURGER UNTUK MEMBUKA SIDEBAR -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Buka menu">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+    </button>
+
+    <!-- SIDEBAR TERSEMBUNYI -->
+    <div id="app-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <img src="logo.jpg" alt="" class="sidebar-logo" onerror="this.style.display='none'">
+                <h3>Navigasi Menu</h3>
+            </div>
+            <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
+        </div>
+        <div class="sidebar-menu">
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-kantin')"><span class="tab-icon">🏪</span> Kantin Jajan</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-bendahara')"><span class="tab-icon">🧮</span> Bendahara &amp; Top-Up</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-pemasukan')"><span class="tab-icon">💰</span> Dashboard Pemasukan</button>
+        </div>
+    </div>
+
+    <!-- OVERLAY GELAP SAAT SIDEBAR MUNCUL -->
+    <div id="sidebar-overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- LAPISAN BALON UNTUK ANIMASI TRANSAKSI BERHASIL -->
+    <div id="balloon-layer" aria-hidden="true"></div>
+
+    <!-- KONTEN UTAMA -->
+    <div class="container">
+
+        <!-- HEADER UTAMA: JUDUL DI KIRI, LOGO DI KANAN -->
+        <div class="header-container">
+            <div class="title-wrapper">
+                <p class="eyebrow">Sistem Terpadu Santri</p>
+                <h1>Portal Digital<br>Pesantren</h1>
+                <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
+            </div>
+            <!-- SESUAIKAN EKSTENSI 'logo.jpg' MENJADI 'logo.png' JIKA FORMAT ASLI GAMBAR ANDA .png -->
+            <img src="logo.jpg" alt="Logo Pesantren" class="app-logo" onerror="this.style.display='none'">
+        </div>
+        <div class="header-divider" aria-hidden="true"></div>
+
+        <!-- TAB 1: KANTIN (TRANSAKSI JAJAN) -->
+        <div id="tab-kantin" class="tab-content active">
+            <h2>Kantin Digital Santri</h2>
+            <div class="form-group">
+                <label>1. Tempelkan / masukkan ID kartu RFID</label>
+                <input type="text" id="kantin-uid" placeholder="Menunggu kartu..." autocomplete="off">
+            </div>
+
+            <div id="kantin-info-kartu" class="stat-card" style="display: none;">
+                <div class="stat-card-head">
+                    <span class="stat-name" id="stat-nama">—</span>
+                    <span class="stat-badge" id="stat-badge">Terdeteksi</span>
+                </div>
+                <div class="stat-hero">
+                    <span class="stat-hero-label">Saldo saat ini</span>
+                    <span class="stat-hero-value" id="stat-saldo">Rp 0</span>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-cell">
+                        <span class="stat-cell-label">Sudah jajan hari ini</span>
+                        <span class="stat-cell-value" id="stat-sudah-jajan">Rp 0</span>
+                    </div>
+                    <div class="stat-cell stat-cell-accent">
+                        <span class="stat-cell-label">Sisa limit harian</span>
+                        <span class="stat-cell-value" id="stat-sisa-limit">Rp 0</span>
+                    </div>
+                </div>
+                <div class="limit-bar" aria-hidden="true">
+                    <div class="limit-bar-fill" id="limit-bar-fill" style="width:0%"></div>
+                </div>
+                <p class="limit-caption">Limit harian: <span id="stat-limit-total">Rp 0</span></p>
+            </div>
+
+            <div class="form-group">
+                <label>2. Masukkan nominal belanja (Rp)</label>
+                <input type="number" id="kantin-nominal" value="0" step="500">
+            </div>
+            <div class="form-group">
+                <label>3. Masukkan PIN santri</label>
+                <input type="password" id="kantin-pin" placeholder="Ketik PIN di sini" autocomplete="new-password">
+            </div>
+            <button class="btn-primary" onclick="prosesJajan()">Proses transaksi jajan 💳</button>
+            <div id="kantin-result" class="result-msg"></div>
+        </div>
+
+        <!-- TAB 2: BENDAHARA -->
+        <div id="tab-bendahara" class="tab-content">
+            <h2>Portal Bendahara Pesantren</h2>
+            <div id="admin-login-box">
+                <p class="hint-text">Masukkan kunci admin untuk akses menu bendahara</p>
+                <input type="password" id="admin-key" placeholder="Kunci admin">
+                <button class="btn-primary" onclick="loginAdmin()">Masuk admin</button>
+                <div id="login-result" class="result-msg"></div>
+            </div>
+
+            <div id="admin-dashboard" style="display: none;">
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" onclick="switchSubTab(event, 'sub-topup')">Top-up saldo</button>
+                    <button class="sub-tab-btn" onclick="switchSubTab(event, 'sub-daftar')">Daftar santri</button>
+                    <button class="sub-tab-btn" onclick="switchSubTab(event, 'sub-cek')">Cek saldo</button>
+                </div>
+
+                <div id="sub-topup" class="sub-content active">
+                    <h3>Form top-up saldo</h3>
+                    <input type="text" id="topup-uid" placeholder="ID kartu RFID santri">
+                    <input type="number" id="topup-nominal" placeholder="Nominal top-up (Rp)" step="1000">
+                    <select id="topup-metode">
+                        <option value="tunai">💵 Uang tunai (kas)</option>
+                        <option value="qris">📱 QRIS otomatis (Midtrans)</option>
+                    </select>
+                    <button class="btn-primary" onclick="prosesTopUp()">Proses top-up 💰</button>
+                    <div id="topup-result" class="result-msg"></div>
+                </div>
+
+                <div id="sub-daftar" class="sub-content">
+                    <h3>Pendaftaran santri baru</h3>
+                    <input type="text" id="daftar-uid" placeholder="ID kartu RFID baru">
+                    <input type="text" id="daftar-nama" placeholder="Nama lengkap santri">
+                    <input type="number" id="daftar-kelas" placeholder="Kelas (angka)">
+                    <input type="text" id="daftar-kamar" placeholder="Kamar / blok asrama">
+                    <input type="password" id="daftar-pin" placeholder="PIN rahasia (4–6 angka)">
+                    <input type="number" id="daftar-saldo" placeholder="Saldo awal (Rp)" value="0" step="1000">
+                    <input type="number" id="daftar-limit" placeholder="Limit harian (Rp)" value="20000" step="1000">
+                    <button class="btn-primary" onclick="prosesDaftar()">Daftarkan santri ✍</button>
+                    <div id="daftar-result" class="result-msg"></div>
+                </div>
+
+                <div id="sub-cek" class="sub-content">
+                    <h3>Cek saldo santri</h3>
+                    <input type="text" id="cek-uid" placeholder="ID kartu RFID">
+                    <button class="btn-primary" onclick="prosesCekSaldo()">Cek saldo 🔍</button>
+                    <div id="cek-result" class="result-msg"></div>
+                </div>
+                <button class="btn-logout" onclick="logoutAdmin()">🚪 Logout admin</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: PEMASUKAN -->
+        <div id="tab-pemasukan" class="tab-content">
+            <h2>Dashboard Pemasukan Santri</h2>
+            <div id="pemasukan-login-box">
+                <input type="password" id="pemasukan-pw" placeholder="Password bendahara">
+                <button class="btn-primary" onclick="loginPemasukan()">Masuk dashboard</button>
+                <div id="pemasukan-login-result" class="result-msg"></div>
+            </div>
+
+            <div id="pemasukan-dashboard" style="display: none;">
+                <div class="metrics-container">
+                    <div class="card-metric">
+                        <h4>Total top-up</h4>
+                        <p id="metric-topup">Rp 0</p>
+                    </div>
+                    <div class="card-metric">
+                        <h4>Total jajan kantin</h4>
+                        <p id="metric-jajan">Rp 0</p>
+                    </div>
+                </div>
+                <h3>Rincian transaksi masuk</h3>
+                <div style="overflow-x:auto;">
+                    <table id="tabel-transaksi">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Nama santri</th>
+                                <th>Nominal</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <button class="btn-logout" onclick="logoutPemasukan()">🚪 Logout dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ELEMEN POPUP / BALON TRANSAKSI BERHASIL -->
+    <div id="popup-balon" class="popup-overlay" style="display: none;">
+        <div class="popup-card">
+            <div class="popup-icon">🎉</div>
+            <h3>Transaksi berhasil!</h3>
+            <div id="popup-content-detail" class="popup-details"></div>
+            <button class="btn-primary" onclick="tutupPopup()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Utama -->
+    <script src="script.js"></script>
+</body>
+</html>
