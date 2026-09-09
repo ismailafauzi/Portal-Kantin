@@ -19,6 +19,44 @@ function formatRupiah(n) {
     return "Rp " + (Number(n) || 0).toLocaleString("id-ID");
 }
 
+// ======================================================
+// FORMAT OTOMATIS TITIK RIBUAN PADA INPUT NOMINAL
+// (contoh: mengetik 200000 otomatis tampil 200.000)
+// ======================================================
+function formatAngkaInput(el) {
+    let posisiDariBelakang = el.value.length - el.selectionStart;
+    let angka = el.value.replace(/\D/g, ""); // buang semua yang bukan digit
+
+    if (angka === "") {
+        el.value = "";
+        return;
+    }
+
+    // Buang nol di depan (kecuali angka itu sendiri "0")
+    angka = angka.replace(/^0+(?=\d)/, "");
+
+    el.value = Number(angka).toLocaleString("id-ID");
+
+    // Jaga posisi kursor tetap wajar saat mengetik di tengah angka
+    let posisiBaru = el.value.length - posisiDariBelakang;
+    el.setSelectionRange(posisiBaru, posisiBaru);
+}
+
+// Ambil nilai murni (tanpa titik) dari sebuah input nominal, sebagai angka
+function angkaBersih(id) {
+    let val = document.getElementById(id).value || "";
+    return parseInt(val.replace(/\D/g, "")) || 0;
+}
+
+// Pasang auto-format ke semua input bertanda class "input-rupiah"
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".input-rupiah").forEach(function(el) {
+        el.addEventListener("input", function() {
+            formatAngkaInput(el);
+        });
+    });
+});
+
 // Menghitung total jajan hari ini + sisa limit untuk seorang santri
 async function hitungStatusHarian(santri) {
     let limitHarian = santri["Limit Harian"] !== undefined && santri["Limit Harian"] !== null
@@ -155,7 +193,7 @@ document.getElementById("kantin-uid").addEventListener("input", async function()
 
 async function prosesJajan() {
     let uid = document.getElementById("kantin-uid").value.trim();
-    let nominal = parseInt(document.getElementById("kantin-nominal").value);
+    let nominal = angkaBersih("kantin-nominal");
     let pin = document.getElementById("kantin-pin").value.trim();
     let resultDiv = document.getElementById("kantin-result");
 
@@ -257,7 +295,7 @@ function logoutAdmin() {
 
 async function prosesTopUp() {
     let uid = document.getElementById("topup-uid").value.trim();
-    let nominal = parseInt(document.getElementById("topup-nominal").value);
+    let nominal = angkaBersih("topup-nominal");
     let metode = document.getElementById("topup-metode").value;
     let resDiv = document.getElementById("topup-result");
 
@@ -299,8 +337,8 @@ async function prosesDaftar() {
     let kelas = parseInt(document.getElementById("daftar-kelas").value) || 0;
     let kamar = document.getElementById("daftar-kamar").value.trim();
     let pin = document.getElementById("daftar-pin").value.trim();
-    let saldoAwal = parseInt(document.getElementById("daftar-saldo").value) || 0;
-    let limit = parseInt(document.getElementById("daftar-limit").value) || LIMIT_DEFAULT;
+    let saldoAwal = angkaBersih("daftar-saldo");
+    let limit = angkaBersih("daftar-limit") || LIMIT_DEFAULT;
     let resDiv = document.getElementById("daftar-result");
 
     if (!uid || !nama || !pin) {
