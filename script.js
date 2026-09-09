@@ -280,7 +280,7 @@ async function prosesJajan() {
 function loginAdmin() {
     let key = document.getElementById("admin-key").value;
     let res = document.getElementById("login-result");
-    if (key === "kunci-rahasia-anda" || key === "admin123") {
+    if (key === "1478963" || key === "admin123") {
         document.getElementById("admin-login-box").style.display = "none";
         document.getElementById("admin-dashboard").style.display = "block";
     } else {
