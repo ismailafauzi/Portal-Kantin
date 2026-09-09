@@ -222,6 +222,10 @@ body {
     position: relative;
 }
 
+/* ---------- Tampil/sembunyi konten tab ---------- */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 h1, h2, h3 {
     color: var(--green-900);
     font-family: var(--font-display);
