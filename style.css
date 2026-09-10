@@ -252,6 +252,12 @@ body {
 .tab-content { display: none !important; }
 .tab-content.active { display: block !important; animation: tab-in 0.22s ease-out; }
 
+/* ---------- Tampil/sembunyi konten sub-tab (Bendahara & Pemasukan) ---------- */
+/* BUG LAMA: aturan ini sebelumnya tidak ada sama sekali, sehingga semua
+   .sub-content selalu terlihat sekaligus (Top-up + Daftar santri numpuk). */
+.sub-content, .pmk-sub-content { display: none !important; }
+.sub-content.active, .pmk-sub-content.active { display: block !important; animation: tab-in 0.22s ease-out; }
+
 @keyframes tab-in {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
@@ -569,6 +575,56 @@ button.btn-primary:active { transform: scale(0.98); }
 .sub-tab-btn.active {
     background: var(--green-700);
     color: #fff;
+}
+
+/* ---------- Dashboard pemasukan: filter tanggal ---------- */
+.pemasukan-filter {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.pemasukan-filter .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 160px;
+}
+
+.pemasukan-filter label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--green-700);
+}
+
+.pemasukan-filter input[type="date"] {
+    margin: 0;
+}
+
+.btn-filter {
+    background: var(--surface-soft);
+    border: 1px solid var(--border-green);
+    color: var(--green-900);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn-filter:hover { background: var(--green-100); }
+
+.pemasukan-filter-status {
+    font-size: 0.78rem;
+    color: var(--green-700);
+    margin: -8px 0 16px;
+    font-weight: 600;
 }
 
 /* ---------- Dashboard pemasukan ---------- */
