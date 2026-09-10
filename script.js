@@ -102,6 +102,24 @@ function sembunyikanKartuStatus() {
 }
 
 // ======================================================
+// TOMBOL LIHAT / SEMBUNYIKAN PIN & PASSWORD
+// ======================================================
+function togglePasswordVisibility(btn, inputId) {
+    let input = document.getElementById(inputId);
+    if (!input) return;
+
+    if (input.type === "password") {
+        input.type = "text";
+        btn.textContent = "🙈";
+        btn.setAttribute("aria-label", "Sembunyikan");
+    } else {
+        input.type = "password";
+        btn.textContent = "👁️";
+        btn.setAttribute("aria-label", "Tampilkan");
+    }
+}
+
+// ======================================================
 // FUNGSI KONTROL SIDEBAR TERSEMBUNYI
 // ======================================================
 function toggleSidebar() {
