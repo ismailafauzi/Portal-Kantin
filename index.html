@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Digital Pesantren Al Bashiroh Purwakarta</title>
     <!-- Favicon: pakai logo pesantren. Jika logo.png gagal dimuat, browser otomatis pakai fallback bawaan -->
-    <link rel="icon" type="image/png" href="logo.png?v=2">
+    <link rel="icon" type="image/png" href="logo.png?v=4">
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- CSS Eksternal (?v=2 = cache-busting, paksa browser ambil versi terbaru) -->
-    <link rel="stylesheet" href="style.css?v=2">
+    <!-- CSS Eksternal (?v=4 = cache-busting, paksa browser ambil versi terbaru) -->
+    <link rel="stylesheet" href="style.css?v=4">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -28,7 +28,7 @@
     <div id="app-sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <img src="logo.png?v=2" alt="" class="sidebar-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback logo-fallback-sm',textContent:'PP'}))">
+                <img src="logo.png?v=4" alt="" class="sidebar-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback logo-fallback-sm',textContent:'PP'}))">
                 <h3>Navigasi Menu</h3>
             </div>
             <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
@@ -56,7 +56,7 @@
                 <h1>Portal Digital<br>Pesantren Al Bashiroh<br>Purwakarta</h1>
                 <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
             </div>
-            <img src="logo.png?v=2" alt="Logo Pesantren" class="app-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'PP'}))">
+            <img src="logo.png?v=4" alt="Logo Pesantren" class="app-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'PP'}))">
         </div>
         <div class="header-divider" aria-hidden="true"></div>
 
@@ -169,9 +169,14 @@
             <div id="pemasukan-dashboard" style="display: none;">
                 <div class="pemasukan-filter">
                     <div class="filter-group">
-                        <label for="pemasukan-tanggal">Filter per tanggal</label>
-                        <input type="date" id="pemasukan-tanggal" onchange="terapkanFilterTanggalPemasukan()">
+                        <label for="pemasukan-tanggal-mulai">Dari tanggal</label>
+                        <input type="date" id="pemasukan-tanggal-mulai">
                     </div>
+                    <div class="filter-group">
+                        <label for="pemasukan-tanggal-akhir">Sampai tanggal (opsional)</label>
+                        <input type="date" id="pemasukan-tanggal-akhir">
+                    </div>
+                    <button class="btn-filter" onclick="terapkanFilterTanggalPemasukan()">Terapkan filter</button>
                     <button class="btn-filter" onclick="resetFilterTanggalPemasukan()">Tampilkan semua tanggal</button>
                 </div>
                 <p id="pemasukan-filter-status" class="pemasukan-filter-status">Menampilkan semua transaksi</p>
@@ -193,7 +198,10 @@
                 </div>
 
                 <div id="pmk-topup" class="pmk-sub-content active">
-                    <h3>Rincian top-up saldo</h3>
+                    <div class="pmk-section-head">
+                        <h3>Rincian top-up saldo</h3>
+                        <button class="btn-filter" onclick="unduhCSVPemasukan('topup')">⬇️ Unduh CSV</button>
+                    </div>
                     <div style="overflow-x:auto;">
                         <table id="tabel-topup">
                             <thead>
@@ -210,7 +218,10 @@
                 </div>
 
                 <div id="pmk-jajan" class="pmk-sub-content">
-                    <h3>Rincian jajan kantin</h3>
+                    <div class="pmk-section-head">
+                        <h3>Rincian jajan kantin</h3>
+                        <button class="btn-filter" onclick="unduhCSVPemasukan('jajan')">⬇️ Unduh CSV</button>
+                    </div>
                     <div style="overflow-x:auto;">
                         <table id="tabel-jajan">
                             <thead>
@@ -241,7 +252,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Utama (?v=2 = cache-busting) -->
-    <script src="script.js?v=2"></script>
+    <!-- JavaScript Utama (?v=4 = cache-busting) -->
+    <script src="script.js?v=4"></script>
 </body>
 </html>
