@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Digital Pesantren Al Bashiroh Purwakarta</title>
-    <!-- Favicon dihapus: logo.png berlatar putih membuat ikon tab browser tampak seperti kotak putih -->
-    <link rel="icon" href="data:,">
+    <!-- Favicon: pakai logo pesantren. Jika logo.png gagal dimuat, browser otomatis pakai fallback bawaan -->
+    <link rel="icon" type="image/png" href="logo.png?v=2">
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -167,6 +167,15 @@
             </div>
 
             <div id="pemasukan-dashboard" style="display: none;">
+                <div class="pemasukan-filter">
+                    <div class="filter-group">
+                        <label for="pemasukan-tanggal">Filter per tanggal</label>
+                        <input type="date" id="pemasukan-tanggal" onchange="terapkanFilterTanggalPemasukan()">
+                    </div>
+                    <button class="btn-filter" onclick="resetFilterTanggalPemasukan()">Tampilkan semua tanggal</button>
+                </div>
+                <p id="pemasukan-filter-status" class="pemasukan-filter-status">Menampilkan semua transaksi</p>
+
                 <div class="metrics-container">
                     <div class="card-metric">
                         <h4>Total top-up</h4>
@@ -177,20 +186,46 @@
                         <p id="metric-jajan">Rp 0</p>
                     </div>
                 </div>
-                <h3>Rincian transaksi masuk</h3>
-                <div style="overflow-x:auto;">
-                    <table id="tabel-transaksi">
-                        <thead>
-                            <tr>
-                                <th>Waktu</th>
-                                <th>Nama santri</th>
-                                <th>Nominal</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn pmk-tab-btn active" onclick="switchPemasukanTab(event, 'pmk-topup')">💰 Pemasukan (Top-up)</button>
+                    <button class="sub-tab-btn pmk-tab-btn" onclick="switchPemasukanTab(event, 'pmk-jajan')">🍔 Jajan kantin</button>
                 </div>
+
+                <div id="pmk-topup" class="pmk-sub-content active">
+                    <h3>Rincian top-up saldo</h3>
+                    <div style="overflow-x:auto;">
+                        <table id="tabel-topup">
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Nama santri</th>
+                                    <th>Nominal</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="pmk-jajan" class="pmk-sub-content">
+                    <h3>Rincian jajan kantin</h3>
+                    <div style="overflow-x:auto;">
+                        <table id="tabel-jajan">
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Nama santri</th>
+                                    <th>Nominal</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <button class="btn-logout" onclick="logoutPemasukan()">🚪 Logout dashboard</button>
             </div>
         </div>
