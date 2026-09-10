@@ -627,6 +627,17 @@ button.btn-primary:active { transform: scale(0.98); }
     font-weight: 600;
 }
 
+.pmk-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.pmk-section-head h3 { margin: 0; }
+
 /* ---------- Dashboard pemasukan ---------- */
 .metrics-container {
     display: flex;
