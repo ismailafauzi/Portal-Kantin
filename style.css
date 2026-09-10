@@ -393,6 +393,40 @@ input:focus, select:focus {
     box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.14);
 }
 
+/* ---------- Tombol lihat/sembunyikan PIN & password ---------- */
+.pw-wrapper {
+    position: relative;
+}
+
+.pw-wrapper input {
+    padding-right: 44px;
+}
+
+.pw-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    /* Kompensasi margin-bottom:10px pada input supaya tombol tetap
+       center secara vertikal terhadap kotak input, bukan terhadap wrapper */
+    padding-bottom: 10px;
+    width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    line-height: 1;
+    color: var(--green-700);
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+}
+
+.pw-toggle:hover { opacity: 1; }
+.pw-toggle:focus { outline: none; opacity: 1; }
+
 button.btn-primary {
     width: 100%;
     background: var(--green-700);
