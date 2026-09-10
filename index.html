@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Digital Pesantren Al Bashiroh Purwakarta</title>
     <!-- Favicon: pakai logo pesantren. Jika logo.png gagal dimuat, browser otomatis pakai fallback bawaan -->
-    <link rel="icon" type="image/png" href="logo.png?v=5">
+    <link rel="icon" type="image/png" href="logo.png?v=4">
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- CSS Eksternal (?v=4 = cache-busting, paksa browser ambil versi terbaru) -->
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=4">
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -28,7 +28,7 @@
     <div id="app-sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <img src="logo.png?v=5" alt="" class="sidebar-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback logo-fallback-sm',textContent:'PP'}))">
+                <img src="logo.png?v=4" alt="" class="sidebar-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback logo-fallback-sm',textContent:'PP'}))">
                 <h3>Navigasi Menu</h3>
             </div>
             <button class="close-btn" onclick="toggleSidebar()" aria-label="Tutup menu">×</button>
@@ -56,7 +56,7 @@
                 <h1>Portal Digital<br>Pesantren Al Bashiroh<br>Purwakarta</h1>
                 <p class="subtitle">Kantin digital, top-up saldo, dan pemasukan dalam satu genggaman</p>
             </div>
-            <img src="logo.png?v=5" alt="Logo Pesantren" class="app-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'PP'}))">
+            <img src="logo.png?v=4" alt="Logo Pesantren" class="app-logo" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-fallback',textContent:'PP'}))">
         </div>
         <div class="header-divider" aria-hidden="true"></div>
 
@@ -99,10 +99,7 @@
             </div>
             <div class="form-group">
                 <label>3. Masukkan PIN santri</label>
-                <div class="pw-wrapper">
-                    <input type="password" id="kantin-pin" placeholder="Ketik PIN di sini" autocomplete="new-password">
-                    <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'kantin-pin')" aria-label="Tampilkan PIN">👁️</button>
-                </div>
+                <input type="password" id="kantin-pin" placeholder="Ketik PIN di sini" autocomplete="new-password">
             </div>
             <button class="btn-primary" onclick="prosesJajan()">Proses transaksi jajan 💳</button>
             <div id="kantin-result" class="result-msg"></div>
@@ -113,10 +110,7 @@
             <h2>Portal Bendahara Pesantren</h2>
             <div id="admin-login-box">
                 <p class="hint-text">Masukkan kunci admin untuk akses menu bendahara</p>
-                <div class="pw-wrapper">
-                    <input type="password" id="admin-key" placeholder="Kunci admin">
-                    <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'admin-key')" aria-label="Tampilkan kunci admin">👁️</button>
-                </div>
+                <input type="password" id="admin-key" placeholder="Kunci admin">
                 <button class="btn-primary" onclick="loginAdmin()">Masuk admin</button>
                 <div id="login-result" class="result-msg"></div>
             </div>
@@ -146,10 +140,7 @@
                     <input type="text" id="daftar-nama" placeholder="Nama lengkap santri">
                     <input type="number" id="daftar-kelas" placeholder="Kelas (angka)">
                     <input type="text" id="daftar-kamar" placeholder="Kamar / blok asrama">
-                    <div class="pw-wrapper">
-                        <input type="password" id="daftar-pin" placeholder="PIN rahasia (4–6 angka)">
-                        <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'daftar-pin')" aria-label="Tampilkan PIN">👁️</button>
-                    </div>
+                    <input type="password" id="daftar-pin" placeholder="PIN rahasia (4–6 angka)">
                     <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-saldo" placeholder="Saldo awal (Rp)" value="0">
                     <input type="text" inputmode="numeric" class="input-rupiah" id="daftar-limit" placeholder="Limit harian (Rp)" value="20.000">
                     <button class="btn-primary" onclick="prosesDaftar()">Daftarkan santri ✍</button>
@@ -170,10 +161,7 @@
         <div id="tab-pemasukan" class="tab-content">
             <h2>Dashboard Pemasukan Santri</h2>
             <div id="pemasukan-login-box">
-                <div class="pw-wrapper">
-                    <input type="password" id="pemasukan-pw" placeholder="Password bendahara">
-                    <button type="button" class="pw-toggle" onclick="togglePasswordVisibility(this, 'pemasukan-pw')" aria-label="Tampilkan password">👁️</button>
-                </div>
+                <input type="password" id="pemasukan-pw" placeholder="Password bendahara">
                 <button class="btn-primary" onclick="loginPemasukan()">Masuk dashboard</button>
                 <div id="pemasukan-login-result" class="result-msg"></div>
             </div>
@@ -264,9 +252,7 @@
         </div>
     </div>
 
-    <!-- JavaScript Utama: nama file diganti dari script.js -> app.js supaya
-         cache lama (yang mungkin masih tersimpan di browser/CDN dengan nama
-         file script.js) tidak lagi terpakai sama sekali. -->
-    <script src="app.js?v=2"></script>
+    <!-- JavaScript Utama (?v=4 = cache-busting) -->
+    <script src="script.js?v=4"></script>
 </body>
 </html>
