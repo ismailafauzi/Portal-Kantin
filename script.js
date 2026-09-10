@@ -446,23 +446,32 @@ function logoutPemasukan() {
 // tidak perlu query ulang ke server setiap kali user ganti tanggal.
 let semuaLogPemasukan = [];
 
+// Menyimpan hasil filter TERAKHIR yang sedang ditampilkan di layar, supaya
+// tombol "Unduh CSV" selalu mengekspor data yang sama persis dengan yang terlihat.
+let logTopupTerfilter = [];
+let logJajanTerfilter = [];
+let filterTanggalAktif = { mulai: null, akhir: null };
+
 async function muatDataPemasukan() {
     let { data: logs } = await _supabase.from(TABLE_LOG).select("*").order("Waktu", { ascending: false });
     semuaLogPemasukan = logs || [];
 
     // Reset filter setiap kali dashboard dibuka ulang
-    document.getElementById("pemasukan-tanggal").value = "";
-    renderPemasukan(null);
+    document.getElementById("pemasukan-tanggal-mulai").value = "";
+    document.getElementById("pemasukan-tanggal-akhir").value = "";
+    renderPemasukan(null, null);
 }
 
-// tanggalFilter: string "YYYY-MM-DD" (dari <input type="date">) atau null/"" untuk semua tanggal
-function renderPemasukan(tanggalFilter) {
+// mulai/akhir: string "YYYY-MM-DD" (dari <input type="date">) atau null/"" untuk tanpa batas
+function renderPemasukan(mulai, akhir) {
     let logs = semuaLogPemasukan;
 
-    if (tanggalFilter) {
+    if (mulai || akhir) {
         logs = logs.filter(row => {
-            let tglRow = new Date(row.Waktu).toLocaleDateString("sv-SE"); // hasil format YYYY-MM-DD sesuai zona waktu lokal
-            return tglRow === tanggalFilter;
+            let tglRow = new Date(row.Waktu).toLocaleDateString("sv-SE"); // format YYYY-MM-DD sesuai zona waktu lokal
+            if (mulai && tglRow < mulai) return false;
+            if (akhir && tglRow > akhir) return false;
+            return true;
         });
     }
 
@@ -473,6 +482,10 @@ function renderPemasukan(tanggalFilter) {
     tbodyTopup.innerHTML = "";
     tbodyJajan.innerHTML = "";
 
+    logTopupTerfilter = [];
+    logJajanTerfilter = [];
+    filterTanggalAktif = { mulai: mulai || null, akhir: akhir || null };
+
     logs.forEach(row => {
         let nominal = parseInt(row.Nominal) || 0;
         let tr = document.createElement("tr");
@@ -481,9 +494,11 @@ function renderPemasukan(tanggalFilter) {
         if (row.Status.includes("Top-up") || row.Status.includes("Pendaftaran")) {
             totalTopup += nominal;
             tbodyTopup.appendChild(tr);
+            logTopupTerfilter.push(row);
         } else if (row.Status.includes("Jajan")) {
             totalJajan += nominal;
             tbodyJajan.appendChild(tr);
+            logJajanTerfilter.push(row);
         }
     });
 
@@ -491,22 +506,98 @@ function renderPemasukan(tanggalFilter) {
     document.getElementById("metric-jajan").innerText = formatRupiah(totalJajan);
 
     let statusEl = document.getElementById("pemasukan-filter-status");
-    if (tanggalFilter) {
-        let label = new Date(tanggalFilter + "T00:00:00").toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-        statusEl.innerText = `Menampilkan transaksi tanggal ${label}`;
+    let labelTgl = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+
+    if (mulai && akhir && mulai !== akhir) {
+        statusEl.innerText = `Menampilkan transaksi ${labelTgl(mulai)} s.d. ${labelTgl(akhir)}`;
+    } else if (mulai || akhir) {
+        statusEl.innerText = `Menampilkan transaksi tanggal ${labelTgl(mulai || akhir)}`;
     } else {
         statusEl.innerText = "Menampilkan semua transaksi";
     }
 }
 
 function terapkanFilterTanggalPemasukan() {
-    let tanggal = document.getElementById("pemasukan-tanggal").value;
-    renderPemasukan(tanggal || null);
+    let mulai = document.getElementById("pemasukan-tanggal-mulai").value || "";
+    let akhir = document.getElementById("pemasukan-tanggal-akhir").value || "";
+
+    if (!mulai && !akhir) {
+        renderPemasukan(null, null);
+        return;
+    }
+
+    // Kalau cuma salah satu diisi, anggap filter untuk 1 hari itu saja
+    if (mulai && !akhir) akhir = mulai;
+    if (!mulai && akhir) mulai = akhir;
+
+    // Kalau user kebalik isi tanggalnya (akhir < mulai), tukar otomatis
+    if (mulai > akhir) { let tmp = mulai; mulai = akhir; akhir = tmp; }
+
+    renderPemasukan(mulai, akhir);
 }
 
 function resetFilterTanggalPemasukan() {
-    document.getElementById("pemasukan-tanggal").value = "";
-    renderPemasukan(null);
+    document.getElementById("pemasukan-tanggal-mulai").value = "";
+    document.getElementById("pemasukan-tanggal-akhir").value = "";
+    renderPemasukan(null, null);
+}
+
+// ======================================================
+// UNDUH CSV (mengikuti filter tanggal yang sedang aktif)
+// ======================================================
+function escapeCSV(nilai) {
+    let teks = String(nilai === undefined || nilai === null ? "" : nilai);
+    // Kalau ada koma, kutip dua, atau baris baru, bungkus dengan tanda kutip dua
+    if (/[",\n]/.test(teks)) {
+        teks = '"' + teks.replace(/"/g, '""') + '"';
+    }
+    return teks;
+}
+
+function buatNamaFileCSV(jenis) {
+    let bagianJenis = jenis === "topup" ? "topup" : "jajan";
+    let { mulai, akhir } = filterTanggalAktif;
+    let bagianTanggal;
+    if (mulai && akhir && mulai !== akhir) {
+        bagianTanggal = `${mulai}_sd_${akhir}`;
+    } else if (mulai || akhir) {
+        bagianTanggal = (mulai || akhir);
+    } else {
+        bagianTanggal = "semua-tanggal";
+    }
+    return `pemasukan-${bagianJenis}_${bagianTanggal}.csv`;
+}
+
+function unduhCSVPemasukan(jenis) {
+    let rows = jenis === "topup" ? logTopupTerfilter : logJajanTerfilter;
+
+    if (!rows || rows.length === 0) {
+        alert("Tidak ada data untuk diunduh pada filter tanggal ini.");
+        return;
+    }
+
+    let header = ["Waktu", "Nama Santri", "Nominal", "Status"];
+    let baris = rows.map(row => [
+        new Date(row.Waktu).toLocaleString("id-ID"),
+        row.Nama,
+        parseInt(row.Nominal) || 0,
+        row.Status
+    ]);
+
+    // Tambahkan BOM (\uFEFF) supaya Excel langsung mengenali UTF-8 dengan benar
+    let csvContent = "\uFEFF" + [header, ...baris]
+        .map(kolom => kolom.map(escapeCSV).join(","))
+        .join("\r\n");
+
+    let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = buatNamaFileCSV(jenis);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // ======================================================
