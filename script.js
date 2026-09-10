@@ -132,10 +132,24 @@ function switchTab(evt, tabName) {
 }
 
 function switchSubTab(evt, subTabName) {
+    // Dibatasi ke .sub-content SAJA (bukan .pmk-sub-content), supaya sub-tab
+    // Bendahara dan sub-tab Pemasukan tidak saling mengganggu.
     let contents = document.getElementsByClassName("sub-content");
     for (let c of contents) c.classList.remove("active");
 
-    let buttons = document.getElementsByClassName("sub-tab-btn");
+    let buttons = document.querySelectorAll(".sub-tab-btn:not(.pmk-tab-btn)");
+    for (let b of buttons) b.classList.remove("active");
+
+    document.getElementById(subTabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+
+// Sub-tab khusus Dashboard Pemasukan (Top-up vs Jajan)
+function switchPemasukanTab(evt, subTabName) {
+    let contents = document.getElementsByClassName("pmk-sub-content");
+    for (let c of contents) c.classList.remove("active");
+
+    let buttons = document.getElementsByClassName("pmk-tab-btn");
     for (let b of buttons) b.classList.remove("active");
 
     document.getElementById(subTabName).classList.add("active");
@@ -428,30 +442,71 @@ function logoutPemasukan() {
     document.getElementById("pemasukan-pw").value = "";
 }
 
+// Menyimpan semua log dari Supabase sekali ambil, supaya filter tanggal
+// tidak perlu query ulang ke server setiap kali user ganti tanggal.
+let semuaLogPemasukan = [];
+
 async function muatDataPemasukan() {
     let { data: logs } = await _supabase.from(TABLE_LOG).select("*").order("Waktu", { ascending: false });
-    if (!logs) return;
+    semuaLogPemasukan = logs || [];
+
+    // Reset filter setiap kali dashboard dibuka ulang
+    document.getElementById("pemasukan-tanggal").value = "";
+    renderPemasukan(null);
+}
+
+// tanggalFilter: string "YYYY-MM-DD" (dari <input type="date">) atau null/"" untuk semua tanggal
+function renderPemasukan(tanggalFilter) {
+    let logs = semuaLogPemasukan;
+
+    if (tanggalFilter) {
+        logs = logs.filter(row => {
+            let tglRow = new Date(row.Waktu).toLocaleDateString("sv-SE"); // hasil format YYYY-MM-DD sesuai zona waktu lokal
+            return tglRow === tanggalFilter;
+        });
+    }
 
     let totalTopup = 0;
     let totalJajan = 0;
-    let tbody = document.querySelector("#tabel-transaksi tbody");
-    tbody.innerHTML = "";
+    let tbodyTopup = document.querySelector("#tabel-topup tbody");
+    let tbodyJajan = document.querySelector("#tabel-jajan tbody");
+    tbodyTopup.innerHTML = "";
+    tbodyJajan.innerHTML = "";
 
     logs.forEach(row => {
         let nominal = parseInt(row.Nominal) || 0;
-        if (row.Status.includes("Top-up") || row.Status.includes("Pendaftaran")) {
-            totalTopup += nominal;
-        } else if (row.Status.includes("Jajan")) {
-            totalJajan += nominal;
-        }
-
         let tr = document.createElement("tr");
         tr.innerHTML = `<td>${new Date(row.Waktu).toLocaleString("id-ID")}</td><td>${row.Nama}</td><td>${formatRupiah(nominal)}</td><td>${row.Status}</td>`;
-        tbody.appendChild(tr);
+
+        if (row.Status.includes("Top-up") || row.Status.includes("Pendaftaran")) {
+            totalTopup += nominal;
+            tbodyTopup.appendChild(tr);
+        } else if (row.Status.includes("Jajan")) {
+            totalJajan += nominal;
+            tbodyJajan.appendChild(tr);
+        }
     });
 
     document.getElementById("metric-topup").innerText = formatRupiah(totalTopup);
     document.getElementById("metric-jajan").innerText = formatRupiah(totalJajan);
+
+    let statusEl = document.getElementById("pemasukan-filter-status");
+    if (tanggalFilter) {
+        let label = new Date(tanggalFilter + "T00:00:00").toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+        statusEl.innerText = `Menampilkan transaksi tanggal ${label}`;
+    } else {
+        statusEl.innerText = "Menampilkan semua transaksi";
+    }
+}
+
+function terapkanFilterTanggalPemasukan() {
+    let tanggal = document.getElementById("pemasukan-tanggal").value;
+    renderPemasukan(tanggal || null);
+}
+
+function resetFilterTanggalPemasukan() {
+    document.getElementById("pemasukan-tanggal").value = "";
+    renderPemasukan(null);
 }
 
 // ======================================================
